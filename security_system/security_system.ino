@@ -25,6 +25,7 @@ dht sensor;
 
 SoftwareSerial esp32 = SoftwareSerial(A0, A1);
 
+unsigned long prevMillis = 0;
 int timer_count = 0;
 bool armed, alarm;
 enum Sys_States {Sys_Init, Sys_Disarmed, Sys_Armed, Sys_Alarm} Sys_State;
@@ -224,7 +225,7 @@ void setup() {
   alarm = false;
 }
 
-void loop() {
+void tick() {
   if (timer_count < 99)
     timer_count++;
   else 
@@ -242,6 +243,11 @@ void loop() {
   if (timer_count % 20 == 0) {
     Sensor_Tick();
   }
-
-  delay(100);
+}
+void loop() {
+  unsigned int currMillis = millis();
+  if (currMillis - prevMillis >= 100) {
+    prevMillis = currMillis;
+    tick();
+  }
 }
